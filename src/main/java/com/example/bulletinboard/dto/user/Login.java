@@ -10,6 +10,6 @@ public class Login {
     @Length(min = 8, max = 16)
     private String username;
 
-    @Length(min = 4, max = 32)
+    @Length(min = 8, max = 32)
     private String password;
 }

@@ -37,9 +37,17 @@ public class CommentMapperImpl implements CommentMapper {
     }
 
     @Override
-    public Comment toComment(CreateOrUpdateComment updateComment, Comment comment) {
+    public Comment fromCommUpdate(CreateOrUpdateComment updateComment, Comment comment) {
         comment.setText(updateComment.getText());
         comment.setCreatedAt(LocalDateTime.now());
+        return comment;
+    }
+
+    @Override
+    public Comment fromCommCreate(CreateOrUpdateComment createOrUpdateComment) {
+        Comment comment = new Comment();
+        comment.setCreatedAt(LocalDateTime.now());
+        comment.setText(createOrUpdateComment.getText());
         return comment;
     }
 }

@@ -7,6 +7,7 @@ import com.example.bulletinboard.dto.user.Role;
 import com.example.bulletinboard.entity.Ad;
 import com.example.bulletinboard.entity.User;
 import com.example.bulletinboard.repository.AdRepo;
+import com.example.bulletinboard.repository.CommentRepo;
 import com.example.bulletinboard.repository.UserRepo;
 import com.example.bulletinboard.service.AdMapper;
 import com.example.bulletinboard.service.AdService;
@@ -14,13 +15,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
+
+import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 @Service
 public class AdServiceImpl implements AdService {
@@ -28,25 +32,25 @@ public class AdServiceImpl implements AdService {
     private String pathToFolder;
     private final AdRepo adsRepo;
     private final AdMapper adMapper;
-    private final UserRepo usersRepo;
+    private final UserRepo userRepo;
+    private final CommentRepo commentRepo;
     private final UserDetails userDetails;
 
 
-    public AdServiceImpl(AdRepo adsRepo, AdMapper adMapper, UserRepo usersRepo, UserDetails userDetails) {
+    public AdServiceImpl(AdRepo adsRepo, AdMapper adMapper, UserRepo userRepo, CommentRepo commentRepo, UserDetails userDetails) {
         this.adsRepo = adsRepo;
         this.adMapper = adMapper;
-        this.usersRepo = usersRepo;
+        this.userRepo = userRepo;
+        this.commentRepo = commentRepo;
         this.userDetails = userDetails;
     }
 
     @Override
-    public AdDto create(CreateOrUpdateAd createdAd, MultipartFile file) {
+    public AdDto create(CreateOrUpdateAd createdAd, MultipartFile file) throws IOException {
         Ad ad = adMapper.fromAdCreate(createdAd);
         User user = getUser();
-        Path path = getPath(file, ad);
         ad.setUser(user);
-        ad.setImage(path.toAbsolutePath().toString());
-        adsRepo.save(adMapper.fromAdCreate(createdAd));
+        loadImage(ad, file);
         return adMapper.toAdDto(adMapper.fromAdCreate(createdAd));
     }
 
@@ -78,11 +82,13 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public void deleteById(Integer id) throws IOException {
         User user = getUser();
         Ad ad = getAdById(id);
         if (rightsVerification(user, ad)) {
+            commentRepo.deleteAllByAd_Id(id);
             adsRepo.deleteById(id);
+            Files.deleteIfExists(Path.of(ad.getImage()));
         }
     }
 
@@ -102,7 +108,7 @@ public class AdServiceImpl implements AdService {
     }
 
     private User getUser() {
-        return usersRepo.findByEmail(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+        return userRepo.findByEmail(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
     }
 
     private Ad getAdById(Integer id) {
@@ -110,6 +116,25 @@ public class AdServiceImpl implements AdService {
     }
 
     private Path getPath(MultipartFile image, Ad ad) {
-        return Path.of(pathToFolder, image.getName() + "Ad-" + ad.getId());
+        return Path.of(pathToFolder, "Ad_" + ad.getId() + "."
+                + StringUtils.getFilenameExtension(image.getOriginalFilename()));
+    }
+
+    public byte[] loadImage(Ad ad, MultipartFile image) throws IOException {
+        Path path = Path.of(pathToFolder, image.getOriginalFilename());
+        Files.createDirectories(path.getParent());
+        Files.deleteIfExists(path);
+
+        try (InputStream is = image.getInputStream();
+             OutputStream os = Files.newOutputStream(path, CREATE_NEW);
+             BufferedInputStream bis = new BufferedInputStream(is, 1024);
+             BufferedOutputStream bos = new BufferedOutputStream(os, 1024)
+        ) {
+            bis.transferTo(bos);
+        }
+
+        ad.setImage(path.toString());
+        adsRepo.save(ad);
+        return image.getBytes();
     }
 }

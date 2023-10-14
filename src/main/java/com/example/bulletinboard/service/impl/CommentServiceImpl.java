@@ -32,11 +32,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDto create(Integer adId, CreateOrUpdateComment createOrUpdateComment) {
         Ad ad = getAdById(adId);
-        Comment comment = commentMapper.toComment(createOrUpdateComment, new Comment());
         User user = getUser();
+        Comment comment = commentMapper.fromCommCreate(createOrUpdateComment);
         comment.setUser(user);
-        comment.setCreatedAt(LocalDateTime.now());
         comment.setAd(ad);
+        commentRepo.save(comment);
         return commentMapper.toCommentDto(comment);
     }
 
@@ -62,7 +62,7 @@ public class CommentServiceImpl implements CommentService {
         Ad ad = getAdById(adId);
         Comment comment = commentRepo.findByIdAndAd_Id(commentId, adId);
         if (rightsVerification(user, ad)){
-            return commentMapper.toCommentDto(commentRepo.save(commentMapper.toComment(createOrUpdateComment, comment)));
+            return commentMapper.toCommentDto(commentRepo.save(commentMapper.fromCommUpdate(createOrUpdateComment, comment)));
         }
         else throw new UnsupportedOperationException("Нет прав на изменение комментария");
     }

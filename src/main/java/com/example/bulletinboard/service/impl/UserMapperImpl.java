@@ -6,11 +6,13 @@ import com.example.bulletinboard.dto.user.UserDto;
 import com.example.bulletinboard.entity.User;
 import com.example.bulletinboard.service.UserMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
 public class UserMapperImpl implements UserMapper {
+    private final PasswordEncoder encoder;
     @Override
     public User toUser(Register register) {
         return User.builder()
@@ -19,6 +21,7 @@ public class UserMapperImpl implements UserMapper {
                 .role(register.getRole())
                 .firstName(register.getFirstName())
                 .lastName(register.getLastName())
+                .password(encoder.encode(register.getPassword()))
                 .build();
     }
 

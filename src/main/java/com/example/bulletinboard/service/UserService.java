@@ -1,14 +1,17 @@
 package com.example.bulletinboard.service;
 
+import com.example.bulletinboard.dto.user.NewPassword;
 import com.example.bulletinboard.dto.user.Register;
 import com.example.bulletinboard.dto.user.UpdateUser;
 import com.example.bulletinboard.dto.user.UserDto;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface UserService {
-    UserDto create(Register register);
-    UserDto getById(Integer id);
-    List<UserDto> getAll();
-    UserDto updateUser(Integer id, UpdateUser updateUser);
+    UserDto updateUser(UpdateUser updateUser);
+    boolean updatePassword(NewPassword newPassword);
+    UserDto getInfoAboutUser();
+    byte [] updateAvatar(MultipartFile avatar) throws IOException;
 }

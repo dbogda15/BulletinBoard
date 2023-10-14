@@ -1,8 +1,12 @@
 package com.example.bulletinboard.service.impl;
 
 import com.example.bulletinboard.dto.user.Register;
+import com.example.bulletinboard.entity.User;
+import com.example.bulletinboard.repository.UserRepo;
 import com.example.bulletinboard.service.AuthService;
-import org.springframework.security.core.userdetails.User;
+import com.example.bulletinboard.service.UserMapper;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -12,11 +16,14 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService {
     private final UserDetailsManager manager;
     private final PasswordEncoder encoder;
+    private final UserMapper userMapper;
+    private final UserRepo userRepo;
 
-    public AuthServiceImpl(UserDetailsManager manager,
-                           PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserDetailsManager manager, PasswordEncoder encoder, UserMapper userMapper, UserRepo userRepo) {
         this.manager = manager;
-        this.encoder = passwordEncoder;
+        this.encoder = encoder;
+        this.userMapper = userMapper;
+        this.userRepo = userRepo;
     }
 
     @Override
@@ -33,13 +40,9 @@ public class AuthServiceImpl implements AuthService {
         if (manager.userExists(register.getUsername())) {
             return false;
         }
-        manager.createUser(
-                User.builder()
-                        .passwordEncoder(this.encoder::encode)
-                        .password(register.getPassword())
-                        .username(register.getUsername())
-                        .roles(register.getRole().name())
-                        .build());
+        User user = userMapper.toUser(register);
+        user.setPassword(encoder.encode(manager.loadUserByUsername(user.getEmail()).getPassword()));
+        userRepo.save(userMapper.toUser(register));
         return true;
     }
 }

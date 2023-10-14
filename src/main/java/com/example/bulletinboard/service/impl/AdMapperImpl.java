@@ -24,11 +24,11 @@ public class AdMapperImpl implements AdMapper {
 
     @Override
     public Ad fromAdCreate(CreateOrUpdateAd createOrUpdateAd) {
-        return Ad.builder()
-                .title(createOrUpdateAd.getTitle())
-                .price(createOrUpdateAd.getPrice())
-                .description(createOrUpdateAd.getDescription())
-                .build();
+        Ad ad = new Ad();
+        ad.setTitle(createOrUpdateAd.getTitle());
+        ad.setPrice(createOrUpdateAd.getPrice());
+        ad.setDescription(createOrUpdateAd.getDescription());
+        return ad;
     }
 
     @Override

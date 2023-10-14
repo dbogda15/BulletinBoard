@@ -7,7 +7,9 @@ import com.example.bulletinboard.service.AdService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,8 +42,13 @@ public class AdController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) {
-        adService.deleteById(id);
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        try {
+            adService.deleteById(id);
+            return ResponseEntity.ok().build();
+        } catch (IOException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @PatchMapping("/{id}")

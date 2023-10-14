@@ -13,6 +13,6 @@ public interface AdService {
     Ads getAll();
     Ads getAllByUserName();
     AdDto update(Integer id, CreateOrUpdateAd createOrUpdateAd);
-    void deleteById(Integer id);
+    void deleteById(Integer id) throws IOException;
     byte[] updateAdImage(Integer id, MultipartFile image) throws IOException;
 }
