@@ -7,7 +7,7 @@ import com.example.bulletinboard.entity.User;
 import com.example.bulletinboard.repository.UserRepo;
 import com.example.bulletinboard.service.UserMapper;
 import com.example.bulletinboard.service.UserService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,18 +25,12 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final UserMapper userMapper;
     private final UserDetails userDetails;
     private final UserDetailsManager userDetailsManager;
-
-    public UserServiceImpl(UserRepo userRepo, UserMapper userMapper, UserDetails userDetails, UserDetailsManager userDetailsManager) {
-        this.userRepo = userRepo;
-        this.userMapper = userMapper;
-        this.userDetails = userDetails;
-        this.userDetailsManager = userDetailsManager;
-    }
 
     @Value("${path.to.avatar.images}")
     private String pathToAvatarFolder;
