@@ -10,8 +10,8 @@ import java.nio.file.Path;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 @Service
-public abstract class FileUtilService {
-    public static void uploadFile(MultipartFile file, Path path) throws IOException {
+public class FileUtilService {
+    public void uploadFile(MultipartFile file, Path path) throws IOException {
         Files.createDirectories(path.getParent());
         Files.deleteIfExists(path);
 

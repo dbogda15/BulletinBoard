@@ -41,7 +41,9 @@ public class AuthUserManager implements UserDetailsManager {
                     .orElseThrow(() -> new UsernameNotFoundException("Такого пользователя не существует"));
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepo.save(user);
-        } else throw new UnsupportedOperationException("Неправильно введен пароль");
+        } else {
+            throw new UnsupportedOperationException("Неправильно введен пароль");
+        }
     }
 
     @Override

@@ -22,7 +22,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/setPassword")
+    @PostMapping("/set_password")
     public ResponseEntity<Boolean> setPassword (@RequestBody NewPassword newPassword){
         return ResponseEntity.ok(userService.updatePassword(newPassword));
     }

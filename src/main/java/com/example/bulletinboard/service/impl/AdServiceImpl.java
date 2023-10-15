@@ -33,13 +33,15 @@ public class AdServiceImpl implements AdService {
     private final UserRepo userRepo;
     private final CommentRepo commentRepo;
     private final UserDetails userDetails;
+    private final FileUtilService fileUtilService;
 
-    public AdServiceImpl(AdRepo adsRepo, AdMapper adMapper, UserRepo userRepo, CommentRepo commentRepo, UserDetails userDetails) {
+    public AdServiceImpl(AdRepo adsRepo, AdMapper adMapper, UserRepo userRepo, CommentRepo commentRepo, UserDetails userDetails, FileUtilService fileUtilService) {
         this.adsRepo = adsRepo;
         this.adMapper = adMapper;
         this.userRepo = userRepo;
         this.commentRepo = commentRepo;
         this.userDetails = userDetails;
+        this.fileUtilService = fileUtilService;
     }
 
     @Override
@@ -94,14 +96,14 @@ public class AdServiceImpl implements AdService {
     public byte[] updateAdImage(Integer id, MultipartFile image) throws IOException {
         Ad ad = adsRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Объявление не найдено"));
         Path filePath = getPath(image, ad);
-        FileUtilService.uploadFile(image, filePath);
+        fileUtilService.uploadFile(image, filePath);
         ad.setImage(filePath.toString());
         adsRepo.save(ad);
         return image.getBytes();
     }
 
     private boolean rightsVerification(User user, Ad ad) {
-        return (user.getRole().equals(Role.ADMIN) || ad.getUser().equals(user));
+        return (user.getRole() == Role.ADMIN || ad.getUser().equals(user));
     }
 
     private User getUser() {
@@ -119,7 +121,7 @@ public class AdServiceImpl implements AdService {
 
     private void loadImage(Ad ad, MultipartFile image) throws IOException {
         Path path = Path.of(pathToFolder, image.getOriginalFilename());
-        FileUtilService.uploadFile(image, path);
+        fileUtilService.uploadFile(image, path);
         ad.setImage(path.toString());
     }
 }

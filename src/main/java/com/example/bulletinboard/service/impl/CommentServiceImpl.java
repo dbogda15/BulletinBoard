@@ -40,8 +40,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comments getComments(Integer id) {
-        return commentMapper.toComments(commentRepo.findAll());
+    public Comments getComments(Integer adId) {
+        return commentMapper.toComments(commentRepo.findAllByAd_Id(adId));
     }
 
     @Override
@@ -51,7 +51,9 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepo.findByIdAndAd_Id(commentId, adId);
         if (rightsVerification(user, ad)) {
             commentRepo.delete(comment);
-        } else throw new UnsupportedOperationException("Нет прав на удаление комментария");
+        } else {
+            throw new UnsupportedOperationException("Нет прав на удаление комментария");
+        }
     }
 
     @Override
@@ -61,7 +63,9 @@ public class CommentServiceImpl implements CommentService {
         if (rightsVerification(user, ad)) {
             Comment comment = commentRepo.findByIdAndAd_Id(commentId, adId);
             return commentMapper.toCommentDto(commentRepo.save(commentMapper.fromCommUpdate(createOrUpdateComment, comment)));
-        } else throw new UnsupportedOperationException("Нет прав на изменение комментария");
+        } else {
+            throw new UnsupportedOperationException("Нет прав на изменение комментария");
+        }
     }
 
     private boolean rightsVerification(User user, Ad ad) {

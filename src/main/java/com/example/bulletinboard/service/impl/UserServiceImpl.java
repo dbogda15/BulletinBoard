@@ -28,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final UserDetails userDetails;
     private final UserDetailsManager userDetailsManager;
+    private final FileUtilService fileUtilService;
 
     @Value("${path.to.avatar.images}")
     private String pathToAvatarFolder;
@@ -58,7 +59,7 @@ public class UserServiceImpl implements UserService {
     public byte[] updateAvatar(MultipartFile avatar) throws IOException {
         User user = getUser();
         Path path = Path.of(pathToAvatarFolder, user.getId() + "." + avatar.getOriginalFilename());
-        FileUtilService.uploadFile(avatar, path);
+        fileUtilService.uploadFile(avatar, path);
         user.setImage(path.toString());
         userRepo.save(user);
         return avatar.getBytes();
