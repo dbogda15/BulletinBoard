@@ -5,26 +5,20 @@ import com.example.bulletinboard.entity.User;
 import com.example.bulletinboard.repository.UserRepo;
 import com.example.bulletinboard.service.AuthService;
 import com.example.bulletinboard.service.UserMapper;
+
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final UserDetailsManager manager;
     private final PasswordEncoder encoder;
     private final UserMapper userMapper;
     private final UserRepo userRepo;
-
-    public AuthServiceImpl(UserDetailsManager manager, PasswordEncoder encoder, UserMapper userMapper, UserRepo userRepo) {
-        this.manager = manager;
-        this.encoder = encoder;
-        this.userMapper = userMapper;
-        this.userRepo = userRepo;
-    }
 
     @Override
     public boolean login(String userName, String password) {

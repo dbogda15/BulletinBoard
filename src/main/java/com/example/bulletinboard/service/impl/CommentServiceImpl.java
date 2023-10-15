@@ -17,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
 @Service
@@ -50,21 +49,19 @@ public class CommentServiceImpl implements CommentService {
         User user = getUser();
         Ad ad = getAdById(adId);
         Comment comment = commentRepo.findByIdAndAd_Id(commentId, adId);
-        if (rightsVerification(user, ad)){
+        if (rightsVerification(user, ad)) {
             commentRepo.delete(comment);
-        }
-        else throw new UnsupportedOperationException("Нет прав на удаление комментария");
+        } else throw new UnsupportedOperationException("Нет прав на удаление комментария");
     }
 
     @Override
     public CommentDto update(Integer adId, Integer commentId, CreateOrUpdateComment createOrUpdateComment) {
         User user = getUser();
         Ad ad = getAdById(adId);
-        Comment comment = commentRepo.findByIdAndAd_Id(commentId, adId);
-        if (rightsVerification(user, ad)){
+        if (rightsVerification(user, ad)) {
+            Comment comment = commentRepo.findByIdAndAd_Id(commentId, adId);
             return commentMapper.toCommentDto(commentRepo.save(commentMapper.fromCommUpdate(createOrUpdateComment, comment)));
-        }
-        else throw new UnsupportedOperationException("Нет прав на изменение комментария");
+        } else throw new UnsupportedOperationException("Нет прав на изменение комментария");
     }
 
     private boolean rightsVerification(User user, Ad ad) {

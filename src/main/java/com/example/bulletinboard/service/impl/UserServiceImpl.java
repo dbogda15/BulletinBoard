@@ -18,10 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 @Slf4j
 @Service
@@ -43,7 +40,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean updatePassword(NewPassword newPassword) {
-        if (checkPassword(newPassword)){
+        if (checkPassword(newPassword)) {
             userDetailsManager.changePassword(newPassword.getCurrentPassword(), newPassword.getNewPassword());
             return true;
         }
@@ -60,29 +57,19 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public byte[] updateAvatar(MultipartFile avatar) throws IOException {
         User user = getUser();
-        Path path = Path.of(pathToAvatarFolder,user.getId() + "." + avatar.getOriginalFilename());
-        Files.createDirectories(path.getParent());
-        Files.deleteIfExists(path);
-
-        try (InputStream is = avatar.getInputStream();
-             OutputStream os = Files.newOutputStream(path, CREATE_NEW);
-             BufferedInputStream bis = new BufferedInputStream(is, 1024);
-             BufferedOutputStream bos = new BufferedOutputStream(os, 1024)
-        ) {
-            bis.transferTo(bos);
-        }
-
+        Path path = Path.of(pathToAvatarFolder, user.getId() + "." + avatar.getOriginalFilename());
+        FileUtilService.uploadFile(avatar, path);
         user.setImage(path.toString());
         userRepo.save(user);
         return avatar.getBytes();
     }
 
-    private boolean checkPassword(NewPassword password){
-        return (password!= null && !password.getNewPassword().isEmpty() && !password.getNewPassword().isBlank()
+    private boolean checkPassword(NewPassword password) {
+        return (password != null && !password.getNewPassword().isEmpty() && !password.getNewPassword().isBlank()
                 && !password.getCurrentPassword().isEmpty() && !password.getCurrentPassword().isBlank());
     }
 
-    private User getUser(){
+    private User getUser() {
         return userRepo.findByEmail(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Пользователя не существует!"));
     }
 }

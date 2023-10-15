@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class UserMapperImpl implements UserMapper {
     private final PasswordEncoder encoder;
+
     @Override
     public User toUser(Register register) {
         return User.builder()

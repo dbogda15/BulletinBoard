@@ -24,8 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
 
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
-
 @Service
 public class AdServiceImpl implements AdService {
     @Value("${path.to.ads.images}")
@@ -35,7 +33,6 @@ public class AdServiceImpl implements AdService {
     private final UserRepo userRepo;
     private final CommentRepo commentRepo;
     private final UserDetails userDetails;
-
 
     public AdServiceImpl(AdRepo adsRepo, AdMapper adMapper, UserRepo userRepo, CommentRepo commentRepo, UserDetails userDetails) {
         this.adsRepo = adsRepo;
@@ -51,7 +48,8 @@ public class AdServiceImpl implements AdService {
         User user = getUser();
         ad.setUser(user);
         loadImage(ad, file);
-        return adMapper.toAdDto(adMapper.fromAdCreate(createdAd));
+        adsRepo.save(ad);
+        return adMapper.toAdDto(ad);
     }
 
     @Override
@@ -95,12 +93,11 @@ public class AdServiceImpl implements AdService {
     @Override
     public byte[] updateAdImage(Integer id, MultipartFile image) throws IOException {
         Ad ad = adsRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Объявление не найдено"));
-        if (ad.getImage()!=null){
-            Files.deleteIfExists(Path.of(ad.getImage()));
-        }
-            ad.setImage(getPath(image, ad).toAbsolutePath().toString());
-            adsRepo.save(ad);
-            return image.getBytes();
+        Path filePath = getPath(image, ad);
+        FileUtilService.uploadFile(image, filePath);
+        ad.setImage(filePath.toString());
+        adsRepo.save(ad);
+        return image.getBytes();
     }
 
     private boolean rightsVerification(User user, Ad ad) {
@@ -120,21 +117,9 @@ public class AdServiceImpl implements AdService {
                 + StringUtils.getFilenameExtension(image.getOriginalFilename()));
     }
 
-    public byte[] loadImage(Ad ad, MultipartFile image) throws IOException {
+    private void loadImage(Ad ad, MultipartFile image) throws IOException {
         Path path = Path.of(pathToFolder, image.getOriginalFilename());
-        Files.createDirectories(path.getParent());
-        Files.deleteIfExists(path);
-
-        try (InputStream is = image.getInputStream();
-             OutputStream os = Files.newOutputStream(path, CREATE_NEW);
-             BufferedInputStream bis = new BufferedInputStream(is, 1024);
-             BufferedOutputStream bos = new BufferedOutputStream(os, 1024)
-        ) {
-            bis.transferTo(bos);
-        }
-
+        FileUtilService.uploadFile(image, path);
         ad.setImage(path.toString());
-        adsRepo.save(ad);
-        return image.getBytes();
     }
 }

@@ -36,13 +36,12 @@ public class AuthUserManager implements UserDetailsManager {
 
     @Override
     public void changePassword(String oldPassword, String newPassword) {
-        if(passwordEncoder.matches(oldPassword, authUser.getPassword())){
+        if (passwordEncoder.matches(oldPassword, authUser.getPassword())) {
             User user = userRepo.findByEmail(authUser.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException("Такого пользователя не существует"));
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepo.save(user);
-        }
-        else throw new UnsupportedOperationException("Неправильно введен пароль");
+        } else throw new UnsupportedOperationException("Неправильно введен пароль");
     }
 
     @Override
