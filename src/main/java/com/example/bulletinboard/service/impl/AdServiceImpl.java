@@ -11,15 +11,20 @@ import com.example.bulletinboard.repository.CommentRepo;
 import com.example.bulletinboard.repository.UserRepo;
 import com.example.bulletinboard.service.AdMapper;
 import com.example.bulletinboard.service.AdService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
@@ -95,11 +100,19 @@ public class AdServiceImpl implements AdService {
     @Override
     public byte[] updateAdImage(Integer id, MultipartFile image) throws IOException {
         Ad ad = adsRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Объявление не найдено"));
-        Path filePath = getPath(image, ad);
-        fileUtilService.uploadFile(image, filePath);
-        ad.setImage(filePath.toString());
+        if (ad.getImage()!=null){
+            Files.deleteIfExists(Path.of(ad.getImage()));
+        }
+        loadImage(ad, image);
         adsRepo.save(ad);
         return image.getBytes();
+    }
+
+    @Override
+    public void downloadImage(Integer id, HttpServletResponse response) throws IOException {
+        Ad ad  = getAdById(id);
+        String imagePath = ad.getImage();
+        fileUtilService.downloadFile(response, imagePath);
     }
 
     private boolean rightsVerification(User user, Ad ad) {
@@ -114,14 +127,13 @@ public class AdServiceImpl implements AdService {
         return adsRepo.findById(id).orElseThrow(() -> new NoSuchElementException("Объявление не найдено"));
     }
 
-    private Path getPath(MultipartFile image, Ad ad) {
-        return Path.of(pathToFolder, "Ad_" + ad.getId() + "."
-                + StringUtils.getFilenameExtension(image.getOriginalFilename()));
+    private Path getPath(MultipartFile image) {
+        return Path.of(pathToFolder, image.getOriginalFilename());
     }
 
     private void loadImage(Ad ad, MultipartFile image) throws IOException {
-        Path path = Path.of(pathToFolder, image.getOriginalFilename());
+        Path path = getPath(image);
         fileUtilService.uploadFile(image, path);
-        ad.setImage(path.toString());
+        ad.setImage(path.toAbsolutePath().toString());
     }
 }

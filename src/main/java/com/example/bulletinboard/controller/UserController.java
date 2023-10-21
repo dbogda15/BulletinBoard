@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Api(tags = "Пользователи")
@@ -40,5 +41,10 @@ public class UserController {
     @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public byte[] updateImage(@RequestParam("image") MultipartFile image) throws IOException {
         return userService.updateAvatar(image);
+    }
+
+    @GetMapping(value = "/image/{userId}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE})
+    public ResponseEntity<Boolean> downloadAvatar(@PathVariable int userId, HttpServletResponse response) throws IOException {
+        return ResponseEntity.ok(userService.downloadAvatar(userId, response));
     }
 }

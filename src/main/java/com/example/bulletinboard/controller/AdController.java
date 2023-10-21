@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Api(tags = "Объявления")
@@ -25,7 +26,6 @@ public class AdController {
     private final AdService adService;
 
     @GetMapping
-
     public Ads getAllAds() {
         return adService.getAll();
     }
@@ -66,5 +66,10 @@ public class AdController {
     public byte[] updateAdImage(@PathVariable Integer id,
                                 @RequestParam("image") MultipartFile image) throws IOException {
         return adService.updateAdImage(id, image);
+    }
+
+    @GetMapping(value = "/image/{adId}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE})
+    public void downloadAdImageFromDB(@PathVariable int adId, HttpServletResponse response) throws IOException {
+        adService.downloadImage(adId, response);
     }
 }

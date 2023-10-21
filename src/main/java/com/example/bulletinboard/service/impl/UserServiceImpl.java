@@ -8,7 +8,6 @@ import com.example.bulletinboard.repository.UserRepo;
 import com.example.bulletinboard.service.UserMapper;
 import com.example.bulletinboard.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,10 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -58,11 +58,25 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public byte[] updateAvatar(MultipartFile avatar) throws IOException {
         User user = getUser();
-        Path path = Path.of(pathToAvatarFolder, user.getId() + "." + avatar.getOriginalFilename());
+        if (user.getImage() != null){
+            Files.deleteIfExists(Path.of(user.getImage()));
+        }
+        Path path = getPath(avatar, user);
         fileUtilService.uploadFile(avatar, path);
-        user.setImage(path.toString());
+        user.setImage(path.toAbsolutePath().toString());
         userRepo.save(user);
         return avatar.getBytes();
+    }
+
+    @Override
+    @Transactional
+    public boolean downloadAvatar(int id, HttpServletResponse response) throws IOException {
+        User user = userRepo.findById(id).orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден!"));
+        if (user.getImage() != null){
+            fileUtilService.downloadFile(response, user.getImage());
+            return true;
+        }
+        return false;
     }
 
     private boolean checkPassword(NewPassword password) {
@@ -72,5 +86,9 @@ public class UserServiceImpl implements UserService {
 
     private User getUser() {
         return userRepo.findByEmail(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Пользователя не существует!"));
+    }
+
+    private Path getPath(MultipartFile image, User user){
+        return Path.of(pathToAvatarFolder, "user_" + user.getId() + "_" + image.getOriginalFilename());
     }
 }
