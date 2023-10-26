@@ -11,22 +11,19 @@ import com.example.bulletinboard.repository.CommentRepo;
 import com.example.bulletinboard.repository.UserRepo;
 import com.example.bulletinboard.service.AdMapper;
 import com.example.bulletinboard.service.AdService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -113,6 +110,12 @@ public class AdServiceImpl implements AdService {
         Ad ad  = getAdById(id);
         String imagePath = ad.getImage();
         fileUtilService.downloadFile(response, imagePath);
+    }
+
+    @Override
+    public Ads findByTitle(String title) {
+        List<Ad> ads = adsRepo.findAllByTitle(title);
+        return adMapper.toAds(ads);
     }
 
     private boolean rightsVerification(User user, Ad ad) {

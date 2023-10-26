@@ -20,9 +20,9 @@ public class CommentMapperImpl implements CommentMapper {
                 .pk(comment.getId())
                 .authorFirstName(comment.getUser().getFirstName())
                 .author(comment.getUser().getId())
-                .authorImage(comment.getUser().getImage())
+                .authorImage("/users/image/" + comment.getUser().getId())
                 .text(comment.getText())
-                .createdAt(comment.getCreatedAt().toInstant(ZoneOffset.UTC))
+                .createdAt(comment.getCreatedAt().toInstant(ZoneOffset.of("+05:00")))
                 .build();
     }
 

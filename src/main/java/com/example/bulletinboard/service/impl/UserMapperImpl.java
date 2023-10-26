@@ -43,7 +43,7 @@ public class UserMapperImpl implements UserMapper {
                 .role(user.getRole())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .image(user.getImage())
+                .image("/users/image/" + user.getId())
                 .build();
     }
 }

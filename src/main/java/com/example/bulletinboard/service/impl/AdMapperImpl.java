@@ -47,7 +47,7 @@ public class AdMapperImpl implements AdMapper {
                 .pk(ad.getId())
                 .price(ad.getPrice())
                 .title(ad.getTitle())
-                .image(ad.getImage())
+                .image("/ads/image/"+ ad.getId())
                 .author(ad.getUser().getId())
                 .build();
     }
@@ -59,7 +59,7 @@ public class AdMapperImpl implements AdMapper {
                 .price(ad.getPrice())
                 .title(ad.getTitle())
                 .description(ad.getDescription())
-                .image(ad.getImage())
+                .image("/ads/image/" + ad.getId())
                 .email(ad.getUser().getEmail())
                 .phone(ad.getUser().getPhone())
                 .authorFirstName(ad.getUser().getFirstName())

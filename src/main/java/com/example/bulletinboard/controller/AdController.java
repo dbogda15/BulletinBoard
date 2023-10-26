@@ -72,4 +72,9 @@ public class AdController {
     public void downloadAdImageFromDB(@PathVariable int adId, HttpServletResponse response) throws IOException {
         adService.downloadImage(adId, response);
     }
+
+    @GetMapping("/find")
+    public ResponseEntity<Ads> findAdsByTitle(@RequestParam String title) {
+        return ResponseEntity.ok(adService.findByTitle(title));
+    }
 }

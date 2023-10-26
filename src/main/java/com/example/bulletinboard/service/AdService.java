@@ -17,4 +17,5 @@ public interface AdService {
     void deleteById(Integer id) throws IOException;
     byte[] updateAdImage(Integer id, MultipartFile image) throws IOException;
     void downloadImage (Integer id, HttpServletResponse response) throws IOException;
+    Ads findByTitle(String title);
 }
