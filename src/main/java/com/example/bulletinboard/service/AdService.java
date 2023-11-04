@@ -3,6 +3,7 @@ package com.example.bulletinboard.service;
 import com.example.bulletinboard.dto.ad.AdDto;
 import com.example.bulletinboard.dto.ad.Ads;
 import com.example.bulletinboard.dto.ad.CreateOrUpdateAd;
+import com.example.bulletinboard.dto.ad.ExtendedAd;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +24,7 @@ public interface AdService {
      * @param id
      * @return AdDto
      */
-    AdDto getById(Integer id);
+    ExtendedAd getById(Integer id);
 
     /**
      * Получить все объявления

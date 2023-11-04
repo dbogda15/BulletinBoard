@@ -18,8 +18,8 @@ public class FileUtilService {
 
         try (InputStream is = file.getInputStream();
              OutputStream os = Files.newOutputStream(path, CREATE_NEW);
-             BufferedInputStream bis = new BufferedInputStream(is, 2048);
-             BufferedOutputStream bos = new BufferedOutputStream(os, 2048)
+             BufferedInputStream bis = new BufferedInputStream(is, 1024);
+             BufferedOutputStream bos = new BufferedOutputStream(os, 1024)
         ) {
             bis.transferTo(bos);
         }

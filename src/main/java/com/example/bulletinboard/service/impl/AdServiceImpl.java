@@ -3,6 +3,7 @@ package com.example.bulletinboard.service.impl;
 import com.example.bulletinboard.dto.ad.AdDto;
 import com.example.bulletinboard.dto.ad.Ads;
 import com.example.bulletinboard.dto.ad.CreateOrUpdateAd;
+import com.example.bulletinboard.dto.ad.ExtendedAd;
 import com.example.bulletinboard.dto.user.Role;
 import com.example.bulletinboard.entity.Ad;
 import com.example.bulletinboard.entity.User;
@@ -57,9 +58,9 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public AdDto getById(Integer id) {
+    public ExtendedAd getById(Integer id) {
         Ad ad = getAdById(id);
-        return adMapper.toAdDto(ad);
+        return adMapper.toExtendedAd(ad);
     }
 
     @Override

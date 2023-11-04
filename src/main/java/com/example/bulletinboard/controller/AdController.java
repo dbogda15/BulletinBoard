@@ -3,6 +3,7 @@ package com.example.bulletinboard.controller;
 import com.example.bulletinboard.dto.ad.AdDto;
 import com.example.bulletinboard.dto.ad.Ads;
 import com.example.bulletinboard.dto.ad.CreateOrUpdateAd;
+import com.example.bulletinboard.dto.ad.ExtendedAd;
 import com.example.bulletinboard.service.AdService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiResponse;
@@ -45,7 +46,7 @@ public class AdController {
     }
 
     @GetMapping("/{id}")
-    public AdDto getAdById(@PathVariable Integer id) {
+    public ExtendedAd getAdById(@PathVariable Integer id) {
         return adService.getById(id);
     }
 
