@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+/**
+ * Сущность объекта Объвление
+ */
 @Data
 @Builder
 @AllArgsConstructor

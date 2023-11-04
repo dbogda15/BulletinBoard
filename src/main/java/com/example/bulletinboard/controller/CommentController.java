@@ -5,6 +5,8 @@ import com.example.bulletinboard.dto.comment.Comments;
 import com.example.bulletinboard.dto.comment.CreateOrUpdateComment;
 import com.example.bulletinboard.service.CommentService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/ads")
+@ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Запрос выполнен успешно"),
+        @ApiResponse(code = 400, message = "Ошибка в параметрах запроса"),
+        @ApiResponse(code = 404, message = "Несуществующий URL"),
+        @ApiResponse(code = 500, message = "Ошибка со стороны сервера")
+})
 public class CommentController {
     private final CommentService commentService;
 

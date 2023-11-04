@@ -7,6 +7,8 @@ import com.example.bulletinboard.security.AuthUserManager;
 import com.example.bulletinboard.service.AuthService;
 import com.example.bulletinboard.service.UserMapper;
 
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
+@ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Запрос выполнен успешно"),
+        @ApiResponse(code = 404, message = "Несуществующий URL")
+})
 public class AuthController {
     private final AuthService authService;
     private final UserRepo userRepo;

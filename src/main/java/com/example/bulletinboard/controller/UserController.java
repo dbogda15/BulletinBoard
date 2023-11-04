@@ -5,6 +5,8 @@ import com.example.bulletinboard.dto.user.UpdateUser;
 import com.example.bulletinboard.dto.user.UserDto;
 import com.example.bulletinboard.service.UserService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,14 @@ import java.io.IOException;
 @RequestMapping("/users")
 @CrossOrigin(value = "http://localhost:3000")
 @RequiredArgsConstructor
+@ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Запрос выполнен успешно"),
+        @ApiResponse(code = 401, message = "Необходима авторизация"),
+        @ApiResponse(code = 403, message = "Доступ запрещен"),
+        @ApiResponse(code = 400, message = "Ошибка в параметрах запроса"),
+        @ApiResponse(code = 404, message = "Несуществующий URL"),
+        @ApiResponse(code = 500, message = "Ошибка со стороны сервера")
+})
 public class UserController {
 
     private final UserService userService;

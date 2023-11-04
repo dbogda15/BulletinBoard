@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+/**
+ * Сущность объекта Пользователь
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
